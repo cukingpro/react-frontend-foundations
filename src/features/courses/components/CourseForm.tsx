@@ -6,10 +6,10 @@ import type { CourseFormData, FormErrors } from '../types';
 import { isLevel, isStatus, validateCourse } from '../utils';
 
 const initialForm: CourseFormData = {
-  name: '',
+  title: '',
   instructor: '',
   level: 'Beginner',
-  learners: '0',
+  studentCount: '0',
   status: 'Draft',
   description: '',
 };
@@ -40,6 +40,8 @@ export function CourseForm({
       return;
     }
     onAdd(form);
+    setForm(initialForm);
+    setErrors({});
   }
   const fieldError = (field: keyof CourseFormData) =>
     errors[field] ? (
@@ -66,16 +68,16 @@ export function CourseForm({
           <label htmlFor="course-name">Tên khóa học</label>
           <input
             id="course-name"
-            name="name"
+            name="title"
             required
             minLength={3}
             maxLength={100}
-            value={form.name}
-            onChange={(e) => update('name', e.target.value)}
-            aria-invalid={!!errors.name}
-            aria-describedby={errors.name ? 'name-error' : undefined}
+            value={form.title}
+            onChange={(e) => update('title', e.target.value)}
+            aria-invalid={!!errors.title}
+            aria-describedby={errors.title ? 'title-error' : undefined}
           />
-          {fieldError('name')}
+          {fieldError('title')}
         </div>
         <div>
           <label htmlFor="course-instructor">Giảng viên</label>
@@ -127,17 +129,19 @@ export function CourseForm({
           <label htmlFor="course-learners">Số học viên</label>
           <input
             id="course-learners"
-            name="learners"
+            name="studentCount"
             type="number"
             min="0"
             step="1"
             required
-            value={form.learners}
-            onChange={(e) => update('learners', e.target.value)}
-            aria-invalid={!!errors.learners}
-            aria-describedby={errors.learners ? 'learners-error' : undefined}
+            value={form.studentCount}
+            onChange={(e) => update('studentCount', e.target.value)}
+            aria-invalid={!!errors.studentCount}
+            aria-describedby={
+              errors.studentCount ? 'studentCount-error' : undefined
+            }
           />
-          {fieldError('learners')}
+          {fieldError('studentCount')}
         </div>
         <div className="full-width">
           <label htmlFor="course-description">Mô tả</label>

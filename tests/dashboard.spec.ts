@@ -1,5 +1,91 @@
 import { expect, test } from '@playwright/test';
 
+test('selection, child status updates, derived filters and selection reset', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await expect(
+    page.getByRole('heading', { name: 'Chưa chọn khóa học' }),
+  ).toBeVisible();
+  const reactCard = page
+    .locator('.course-card')
+    .filter({ hasText: 'Your First React Application' });
+  await reactCard.getByRole('button', { name: /Xem chi tiết/ }).click();
+  await expect(reactCard).toHaveClass(/course-card--selected/);
+  await expect(reactCard.getByRole('button')).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  const details = page.locator('#course-details');
+  await expect(details).toContainText('Huy Nguyễn');
+  await expect(details).toContainText('Beginner');
+  await expect(details).toContainText('0');
+  await page.getByLabel('Trạng thái', { exact: true }).selectOption('Draft');
+  await page.getByLabel('Cập nhật trạng thái').selectOption('Open');
+  await expect(page.locator('.course-card')).toHaveCount(0);
+  await expect(details.getByLabel('Cập nhật trạng thái')).toHaveValue('Open');
+  await expect(
+    page.getByRole('status').filter({ hasText: 'Đã cập nhật' }),
+  ).toContainText('Open');
+  await page.getByRole('button', { name: 'Xóa bộ lọc' }).click();
+  await expect(reactCard).toContainText('Open');
+  await page.getByLabel('Cập nhật trạng thái').selectOption('Closed');
+  await expect(reactCard).toContainText('Closed');
+  await page.getByRole('button', { name: 'Bỏ chọn' }).click();
+  await expect(
+    page.getByRole('heading', { name: 'Chưa chọn khóa học' }),
+  ).toBeVisible();
+  await reactCard.getByRole('button').click();
+  await page
+    .getByText('Phòng kiểm thử dữ liệu · loading / error / empty')
+    .click();
+  await page.getByRole('button', { name: 'Danh sách rỗng' }).click();
+  await expect(
+    page.getByRole('heading', { name: 'Thư viện chưa có khóa học' }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Chưa chọn khóa học' }),
+  ).toBeVisible();
+});
+
+test('negative counts, create first course and reset controlled form', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await expect(page.locator('.course-card')).toHaveCount(6);
+  await page
+    .getByText('Phòng kiểm thử dữ liệu · loading / error / empty')
+    .click();
+  await page.getByRole('button', { name: 'Danh sách rỗng' }).click();
+  await expect(
+    page.getByRole('heading', { name: 'Thư viện chưa có khóa học' }),
+  ).toBeVisible();
+  await page.getByRole('button', { name: '＋ Thêm khóa học' }).click();
+  await page.getByLabel('Tên khóa học', { exact: true }).fill('Module 2 React');
+  await page.getByLabel('Giảng viên', { exact: true }).fill('Huy Nguyễn');
+  await page
+    .getByLabel('Mô tả', { exact: true })
+    .fill('Thực hành components, props và state.');
+  await page.getByLabel('Số học viên', { exact: true }).fill('-1');
+  await page.getByRole('button', { name: 'Lưu khóa học' }).click();
+  await expect(
+    page.getByText('Số học viên phải là số nguyên không âm hợp lệ.'),
+  ).toBeVisible();
+  await expect(page.locator('.course-card')).toHaveCount(0);
+  await page.getByLabel('Số học viên', { exact: true }).fill('12');
+  await page.locator('#course-status').selectOption('Open');
+  await page.getByRole('button', { name: 'Lưu khóa học' }).click();
+  await expect(page.locator('.course-card')).toHaveCount(1);
+  await expect(page.locator('.course-card')).toContainText('12 học viên');
+  await page.getByRole('button', { name: '＋ Thêm khóa học' }).click();
+  await expect(page.getByLabel('Tên khóa học', { exact: true })).toHaveValue(
+    '',
+  );
+  await expect(page.getByLabel('Số học viên', { exact: true })).toHaveValue(
+    '0',
+  );
+});
+
 test('search, combined filters, empty results and validated course creation', async ({
   page,
 }) => {
@@ -11,9 +97,7 @@ test('search, combined filters, empty results and validated course creation', as
   await page
     .getByLabel('Trình độ', { exact: true })
     .selectOption('Intermediate');
-  await page
-    .getByLabel('Trạng thái', { exact: true })
-    .selectOption('Published');
+  await page.getByLabel('Trạng thái', { exact: true }).selectOption('Open');
   await expect(page.locator('.course-card')).toHaveCount(1);
   await expect(page.locator('.course-card')).toContainText('TypeScript');
   await page.getByLabel('Tìm kiếm', { exact: true }).fill('not-found');

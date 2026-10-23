@@ -1,21 +1,21 @@
 export const levels = ['Beginner', 'Intermediate', 'Advanced'] as const;
-export const statuses = ['Draft', 'Published', 'Archived'] as const;
-export type Level = (typeof levels)[number];
+export const statuses = ['Draft', 'Open', 'Closed'] as const;
+export type CourseLevel = (typeof levels)[number];
 export type CourseStatus = (typeof statuses)[number];
 export interface Course {
   id: string;
-  name: string;
+  title: string;
   instructor: string;
-  level: Level;
-  learners: number;
+  level: CourseLevel;
+  studentCount: number;
   status: CourseStatus;
   description: string;
 }
 export interface CourseFormData {
-  name: string;
+  title: string;
   instructor: string;
-  level: Level;
-  learners: string;
+  level: CourseLevel;
+  studentCount: string;
   status: CourseStatus;
   description: string;
 }

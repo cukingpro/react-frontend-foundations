@@ -3,12 +3,14 @@ import { Button } from '../components/ui/Button';
 import { StatePanel } from '../components/ui/StatePanel';
 import { CourseForm } from '../features/courses/components/CourseForm';
 import { CourseList } from '../features/courses/components/CourseList';
+import { CourseDetails } from '../features/courses/components/CourseDetails';
+import { CourseFilters } from '../features/courses/components/CourseFilters';
 import { useCourses } from '../features/courses/hooks/useCourses';
-import { levels, statuses } from '../features/courses/types';
 import { filterCourses } from '../features/courses/utils';
 
-export function CoursesPage() {
-  const { state, mode, load, addCourse } = useCourses();
+export function CourseDashboardPage() {
+  const { state, mode, load, addCourse, updateCourseStatus } = useCourses();
+  const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [level, setLevel] = useState('all');
   const [status, setStatus] = useState('all');
@@ -17,6 +19,9 @@ export function CoursesPage() {
   const addButton = useRef<HTMLDivElement>(null);
   const courses = state.status === 'success' ? state.data : [];
   const filtered = filterCourses(courses, search, level, status);
+  const selectedCourse = courses.find(
+    (course) => course.id === selectedCourseId,
+  );
   function clearFilters() {
     setSearch('');
     setLevel('all');
@@ -58,10 +63,10 @@ export function CoursesPage() {
           <small>Trong thư viện của bạn</small>
         </article>
         <article className="stat">
-          <span>Đang xuất bản</span>
+          <span>Đang mở</span>
           <strong>
             {courses
-              .filter((course) => course.status === 'Published')
+              .filter((course) => course.status === 'Open')
               .length.toString()
               .padStart(2, '0')}
           </strong>
@@ -73,7 +78,7 @@ export function CoursesPage() {
           <span>Tổng lượt học viên</span>
           <strong>
             {courses
-              .reduce((sum, course) => sum + course.learners, 0)
+              .reduce((sum, course) => sum + course.studentCount, 0)
               .toLocaleString('vi')}
           </strong>
           <small>Cùng nhau phát triển mỗi ngày</small>
@@ -89,7 +94,7 @@ export function CoursesPage() {
             addCourse(data);
             clearFilters();
             closeForm();
-            setNotice(`Đã thêm khóa học “${data.name.trim()}”.`);
+            setNotice(`Đã thêm khóa học “${data.title.trim()}”.`);
           }}
         />
       )}
@@ -99,44 +104,15 @@ export function CoursesPage() {
         </h2>
         <span className="muted">Kiến thức tốt, khởi đầu tốt.</span>
       </div>
-      <div className="filters">
-        <label className="search-field" htmlFor="course-search">
-          Tìm kiếm
-          <input
-            id="course-search"
-            type="search"
-            placeholder="Tên khóa học hoặc giảng viên…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </label>
-        <div>
-          <label htmlFor="level-filter">Trình độ</label>
-          <select
-            id="level-filter"
-            value={level}
-            onChange={(e) => setLevel(e.target.value)}
-          >
-            <option value="all">Tất cả trình độ</option>
-            {levels.map((item) => (
-              <option key={item}>{item}</option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label htmlFor="status-filter">Trạng thái</label>
-          <select
-            id="status-filter"
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-          >
-            <option value="all">Tất cả trạng thái</option>
-            {statuses.map((item) => (
-              <option key={item}>{item}</option>
-            ))}
-          </select>
-        </div>
-      </div>
+      <CourseFilters
+        search={search}
+        level={level}
+        status={status}
+        onSearchChange={setSearch}
+        onLevelChange={setLevel}
+        onStatusChange={setStatus}
+        onReset={clearFilters}
+      />
       <div aria-busy={state.status === 'loading'}>
         {(state.status === 'idle' || state.status === 'loading') && (
           <StatePanel title="Đang tải khóa học…">
@@ -157,7 +133,11 @@ export function CoursesPage() {
               Hiển thị {filtered.length} / {courses.length} khóa học
             </p>
             {filtered.length ? (
-              <CourseList courses={filtered} />
+              <CourseList
+                courses={filtered}
+                selectedCourseId={selectedCourseId}
+                onSelect={setSelectedCourseId}
+              />
             ) : (
               <StatePanel
                 title={
@@ -181,6 +161,16 @@ export function CoursesPage() {
           </>
         )}
       </div>
+      {state.status === 'success' && (
+        <CourseDetails
+          course={selectedCourse}
+          onDeselect={() => setSelectedCourseId(null)}
+          onStatusChange={(id, nextStatus) => {
+            updateCourseStatus(id, nextStatus);
+            setNotice(`Đã cập nhật trạng thái thành ${nextStatus}.`);
+          }}
+        />
+      )}
       <details className="demo-tools">
         <summary>Phòng kiểm thử dữ liệu · loading / error / empty</summary>
         <p>
@@ -203,6 +193,7 @@ export function CoursesPage() {
               onClick={() => {
                 setAdding(false);
                 setNotice('');
+                setSelectedCourseId(null);
                 void load(value);
               }}
             >

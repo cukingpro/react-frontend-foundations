@@ -4,11 +4,11 @@ import type {
   Course,
   CourseFormData,
   FormErrors,
-  Level,
+  CourseLevel,
   CourseStatus,
 } from './types';
 
-export function isLevel(value: unknown): value is Level {
+export function isLevel(value: unknown): value is CourseLevel {
   return levels.some((level) => level === value);
 }
 export function isStatus(value: unknown): value is CourseStatus {
@@ -19,14 +19,14 @@ export function isCourse(value: unknown): value is Course {
     isRecord(value) &&
     'id' in value &&
     typeof value.id === 'string' &&
-    typeof value.name === 'string' &&
+    typeof value.title === 'string' &&
     typeof value.instructor === 'string' &&
     typeof value.description === 'string' &&
     isLevel(value.level) &&
     isStatus(value.status) &&
-    typeof value.learners === 'number' &&
-    Number.isSafeInteger(value.learners) &&
-    value.learners >= 0
+    typeof value.studentCount === 'number' &&
+    Number.isSafeInteger(value.studentCount) &&
+    value.studentCount >= 0
   );
 }
 export function isCourseList(value: unknown): value is Course[] {
@@ -45,7 +45,7 @@ export function filterCourses(
   const query = search.trim().toLocaleLowerCase('vi');
   return courses.filter(
     (course) =>
-      `${course.name} ${course.instructor}`
+      `${course.title} ${course.instructor}`
         .toLocaleLowerCase('vi')
         .includes(query) &&
       (level === 'all' || course.level === level) &&
@@ -54,8 +54,8 @@ export function filterCourses(
 }
 export function validateCourse(data: CourseFormData): FormErrors {
   const errors: FormErrors = {};
-  if (data.name.trim().length < 3 || data.name.trim().length > 100)
-    errors.name = 'Tên khóa học cần từ 3 đến 100 ký tự.';
+  if (data.title.trim().length < 3 || data.title.trim().length > 100)
+    errors.title = 'Tên khóa học cần từ 3 đến 100 ký tự.';
   if (data.instructor.trim().length < 2 || data.instructor.trim().length > 80)
     errors.instructor = 'Tên giảng viên cần từ 2 đến 80 ký tự.';
   if (
@@ -64,10 +64,10 @@ export function validateCourse(data: CourseFormData): FormErrors {
   )
     errors.description = 'Mô tả cần từ 10 đến 600 ký tự.';
   if (
-    !/^\d+$/.test(data.learners) ||
-    !Number.isSafeInteger(Number(data.learners))
+    !/^\d+$/.test(data.studentCount) ||
+    !Number.isSafeInteger(Number(data.studentCount))
   )
-    errors.learners = 'Số học viên phải là số nguyên không âm hợp lệ.';
+    errors.studentCount = 'Số học viên phải là số nguyên không âm hợp lệ.';
   if (!isLevel(data.level)) errors.level = 'Vui lòng chọn trình độ hợp lệ.';
   if (!isStatus(data.status))
     errors.status = 'Vui lòng chọn trạng thái hợp lệ.';

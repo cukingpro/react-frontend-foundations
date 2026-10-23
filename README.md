@@ -1,13 +1,12 @@
-# Course Studio · Module 1
+# Course Studio · Module 2
 
-Project **React + TypeScript + Vite** theo [Module 1 trên Notion](https://app.notion.com/p/3f8266843376800a97ced2d6cdf9cdc3), đã đọc Definition of Done và toàn bộ 8 trang con qua Notion MCP ngày 13/10/2026.
+Project **React + TypeScript + Vite**, tiếp tục trực tiếp từ Module 1 theo [Definition of Done Module 2](https://app.notion.com/p/40226684337680cb8b9bd866e8c35913). Code đã được chuyển từ `module 1/` lên root repository, nhánh làm việc `module-2`. Các bài thực hành Module 1 được giữ lại.
 
 ## Chạy ứng dụng
 
 Yêu cầu Node.js **22.12+** và npm.
 
 ```sh
-cd "module 1"
 npm ci
 npm run dev
 ```
@@ -35,7 +34,7 @@ npm run test:e2e
 
 ## Các khu vực
 
-- **Khóa học** (`#courses`): 6 khóa học mẫu, tìm theo tên/giảng viên, lọc trình độ + trạng thái đồng thời, xem toàn bộ thông tin trong card, thêm khóa học có validation.
+- **Khóa học** (`#courses`): 6 khóa học mẫu, tìm theo tên/giảng viên, lọc trình độ + trạng thái, đặt lại bộ lọc, chọn/xem chi tiết, đổi trạng thái Draft/Open/Closed và thêm khóa học có validation.
 - **Lộ trình React** (`#landing`): landing page có hero, lợi ích và curriculum 8 mục.
 - **Phòng thực hành** (`#practice`): todo thêm/hoàn thành/xóa, sinh viên ≥ 80 điểm, tìm email, tìm người dùng, giỏ hàng, null safety, generic API responses và public API.
 - **Hồ sơ & liên hệ** (`#profile`): semantic profile, kỹ năng, dự án, contact form và bảng lịch học.
@@ -73,8 +72,8 @@ src/
 ├── constants/              # API base URL
 ├── features/
 │   ├── courses/
-│   │   ├── components/     # CourseCard, CourseList, CourseForm
-│   │   ├── hooks/          # useCourses: request lifecycle, cancellation, add
+│   │   ├── components/     # CourseCard, CourseList, CourseForm, CourseFilters, CourseDetails
+│   │   ├── hooks/          # useCourses: request lifecycle, cancellation, add/update
 │   │   ├── services/       # Mock/local JSON data access
 │   │   ├── data.ts         # Typed course seed data
 │   │   ├── types.ts        # Course, CourseFormData, literal unions
@@ -100,19 +99,10 @@ docs/                       # Requirements map, learning notes, code review
 - [Đối chiếu Definition of Done và mục 1–8](docs/REQUIREMENTS.md)
 - [Ghi chú lý thuyết và bài tập](docs/LEARNING-NOTES.md)
 - [Bài tập code review/refactor](docs/CODE-REVIEW.md)
+- [Module 2: đối chiếu DoD, state ownership và rendering](docs/MODULE-2.md)
 
 Các checklist trong tài liệu đối chiếu **phần triển khai**; không thay thế việc học viên tự đánh giá mình đã hiểu kiến thức hay chưa.
 
-## Git workflow gợi ý
+## Git workflow
 
-Chạy từ root repository hiện tại (project dùng chung Git repo cha):
-
-```sh
-git switch -c feat/module-1-course-studio
-git status --short
-git add "module 1"
-git diff --cached
-git commit -m "feat: build module 1 course dashboard and practice labs"
-```
-
-Trước commit, chạy `npm run check` và `npm run test:e2e` trong `module 1`. Review diff, mở pull request và merge sau review. Không cần tạo repository lồng nhau.
+Làm việc trên nhánh `module-2`. Chạy `npm run check` và `npm run test:e2e` từ root trước commit. Review diff, mở pull request và merge sau review. Các tài liệu Module 1 trong `docs/` được giữ làm lịch sử; đối chiếu yêu cầu hiện tại tại `docs/MODULE-2.md`.

@@ -1,19 +1,19 @@
 [
   {
     "id": "api-react",
-    "name": "React API Workshop",
+    "title": "React API Workshop",
     "instructor": "Huy Nguyễn",
     "level": "Intermediate",
-    "learners": 24,
-    "status": "Published",
+    "studentCount": 24,
+    "status": "Open",
     "description": "Khóa học được tải bằng fetch từ JSON qua HTTP, kiểm tra response.ok và runtime type guard."
   },
   {
     "id": "api-ts",
-    "name": "TypeScript API Safety",
+    "title": "TypeScript API Safety",
     "instructor": "Linh Nguyễn",
     "level": "Advanced",
-    "learners": 18,
+    "studentCount": 18,
     "status": "Draft",
     "description": "Phân biệt type checking lúc biên dịch và kiểm tra dữ liệu chưa tin cậy tại runtime."
   }

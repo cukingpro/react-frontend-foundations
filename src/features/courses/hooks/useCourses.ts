@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { ApiState } from '../../../types/api';
 import { getErrorMessage } from '../../../utils/errors';
 import { getCourses } from '../services/courseService';
-import type { Course, CourseFormData, DataMode } from '../types';
+import type { Course, CourseFormData, CourseStatus, DataMode } from '../types';
 
 export function useCourses() {
   const [state, setState] = useState<ApiState<Course[]>>({ status: 'loading' });
@@ -52,10 +52,10 @@ export function useCourses() {
     const course: Course = {
       ...data,
       id: crypto.randomUUID(),
-      name: data.name.trim(),
+      title: data.title.trim(),
       instructor: data.instructor.trim(),
       description: data.description.trim(),
-      learners: Number(data.learners),
+      studentCount: Number(data.studentCount),
     };
     setState((previous) =>
       previous.status === 'success'
@@ -63,5 +63,17 @@ export function useCourses() {
         : previous,
     );
   }
-  return { state, mode, load, addCourse };
+  function updateCourseStatus(id: string, status: CourseStatus) {
+    setState((previous) =>
+      previous.status === 'success'
+        ? {
+            ...previous,
+            data: previous.data.map((course) =>
+              course.id === id ? { ...course, status } : course,
+            ),
+          }
+        : previous,
+    );
+  }
+  return { state, mode, load, addCourse, updateCourseStatus };
 }

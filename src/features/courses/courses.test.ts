@@ -4,18 +4,18 @@ import type { CourseFormData } from './types';
 import { filterCourses, isCourseList, validateCourse } from './utils';
 
 const valid: CourseFormData = {
-  name: 'React Basics',
+  title: 'React Basics',
   instructor: 'Huy Nguyễn',
   description: 'Khóa học React dành cho người mới.',
   level: 'Beginner',
   status: 'Draft',
-  learners: '0',
+  studentCount: '0',
 };
 describe('course boundaries', () => {
-  it('combines instructor/name search with both filters without mutating source', () => {
+  it('combines instructor/title search with both filters without mutating source', () => {
     const before = structuredClone(initialCourses);
     expect(
-      filterCourses(initialCourses, ' LINH ', 'Intermediate', 'Published').map(
+      filterCourses(initialCourses, ' LINH ', 'Intermediate', 'Open').map(
         (course) => course.id,
       ),
     ).toEqual(['ts']);
@@ -30,14 +30,22 @@ describe('course boundaries', () => {
     expect(
       validateCourse({
         ...valid,
-        name: '   ',
+        title: '   ',
         instructor: ' ',
         description: ' short ',
-        learners: '-1',
+        studentCount: '-1',
       }),
-    ).toHaveProperty('name');
-    for (const learners of ['', '1.5', '-1', 'Infinity', '9007199254740992'])
-      expect(validateCourse({ ...valid, learners })).toHaveProperty('learners');
+    ).toHaveProperty('title');
+    for (const studentCount of [
+      '',
+      '1.5',
+      '-1',
+      'Infinity',
+      '9007199254740992',
+    ])
+      expect(validateCourse({ ...valid, studentCount })).toHaveProperty(
+        'studentCount',
+      );
     expect(
       validateCourse({ ...valid, description: 'x'.repeat(601) }),
     ).toHaveProperty('description');
@@ -49,7 +57,9 @@ describe('course boundaries', () => {
     expect(isCourseList([{ ...initialCourses[0], level: 'Expert' }])).toBe(
       false,
     );
-    expect(isCourseList([{ ...initialCourses[0], learners: NaN }])).toBe(false);
+    expect(isCourseList([{ ...initialCourses[0], studentCount: NaN }])).toBe(
+      false,
+    );
     expect(isCourseList([initialCourses[0], initialCourses[0]])).toBe(false);
   });
 });
